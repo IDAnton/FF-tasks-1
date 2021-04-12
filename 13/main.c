@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define FILE_FORMAT ".dat"
+
 typedef struct date{
     int day;
     int month;
@@ -263,7 +265,7 @@ int book_menu(char* book_name, CPeople** list) {
             char file_name[255];
             memset(file_name, 0, sizeof(file_name));
             strcat(file_name, book_name);
-            strcat(file_name, ".dat");
+            strcat(file_name, FILE_FORMAT);
             file = fopen(file_name, "r");
             if (file != NULL) {
                 fclose(file);
@@ -308,7 +310,7 @@ void main_menu(CPeople** list){
             char file_name[255];
             memset(file_name, 0, sizeof(file_name));
             strcat(file_name, book_name);
-            strcat(file_name, ".dat");
+            strcat(file_name, FILE_FORMAT);
             FILE* file;
             file = fopen(file_name, "r");
             if (file == NULL){

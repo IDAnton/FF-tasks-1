@@ -1,21 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "string_processing.h"
 
-#define CLUSTER_SIZE 3
+#define CLUSTER_SIZE 5
 #define TERMINATOR '#'
 
-void print(char* str, char terminator){
-    int i = 0;
-    while(str[i] != terminator) {
-        putchar(str[i]);
-        i++;
-    }
-}
 
 char* trim_buffer(char* str, int size){
     char* new_str = (char*)malloc(sizeof(char)*size);
     for(int i = 0; i < size; i++)
         new_str[i] = str[i];
+    new_str[size-1] = '\0';
     free(str);
     return new_str;
 }
@@ -26,49 +21,68 @@ char* reallocate_memory(char* str, int* size){
     for(int i = 0; i < CLUSTER_SIZE*(*size); i++)
         new_str[i] = str[i];
     free(str);
-    printf("ee %d\n", *size);
     return new_str;
 }
 
 char* GetText(FILE* stream, char terminator){
     char* str = (char*)malloc(sizeof(char)*CLUSTER_SIZE);
-    char input = '0', tmp;
+    char input = '0';
     int size = 1, i = 0;
-
     while((input != terminator) && (input != EOF)){
         if(stream == NULL)
             input = getchar();
         else
             input = fgetc(stream);
-        tmp = getchar();
         str[i] = input;
         i++;
-        printf("i = %d; size = %d; info = %d\n", i, size, i%CLUSTER_SIZE);
+        //printf("i = %d; size = %d; info = %d\n", i, size, i%CLUSTER_SIZE);
         if(i%CLUSTER_SIZE == 0)
             str = reallocate_memory(str, &size);
     }
-//    putchar(str[i-1]);
-//    scanf_s("%d",&tmp);
-//    if(str[i-1] != terminator)
-//        str[i] = terminator;
     str = trim_buffer(str, i);
     return str;
 }
 
 void menu(){
     int input;
+    char* str;
     while (1){
+        printf("Text processing program. Select input source:\n\n");
         printf("1)Input from console\n");
         printf("2)Input from file\n");
-        printf("3)Input from exit\n");
+        printf("3)Exit\n");
         scanf_s("%d", &input);
-        if (input == 3)
-            return;
+        getchar();
+        system("cls");
+        switch (input){
+            case 1: {
+                printf("Enter string\n\n");
+                str = GetText(NULL, TERMINATOR);
+                break;
+            }
+            case 2: {
+                char file_name[30];
+                printf("Enter file name\n");
+                scanf("%s", file_name);
+                FILE* file = fopen(file_name, "r");
+                str = GetText(file, TERMINATOR);
+                fclose(file);
+                break;
+            }
+            case 3:
+                return;
+        }
+        system("cls");
+        printf("RAW TEXT:\n%s\n\n", str);
+        correct_string(str, get_str_len(str)-1);
+        printf("PROCESSED TEXT:\n%s\n\nPress any key to continue ", str);
+        scanf_s("%d", &input);
+        system("cls");
+        free(str);
     }
 }
 
 int main(){
-    char* str = GetText(NULL, TERMINATOR);
-    print(str, TERMINATOR);
+    menu();
     return 0;
 }
